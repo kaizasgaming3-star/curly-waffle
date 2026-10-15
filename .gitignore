@@ -1,0 +1,8 @@
+node_modules/
+session/
+temp/
+backup/
+.env
+.env.*
+!.env.example
+*.log
