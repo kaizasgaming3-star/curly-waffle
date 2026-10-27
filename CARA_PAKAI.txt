@@ -1,0 +1,47 @@
+======================================================
+  PANDUAN PEMASANGAN & PENGGUNAAN DENIA-MD
+======================================================
+
+Fail ini dibungkus bersama DeniaMD.zip untuk memudahkan rujukan anda.
+
+------------------------------------------------------
+A. CARA MENJALANKAN DI BOT-HOSTING.NET / PANEL HOSTING
+------------------------------------------------------
+1. Muat naik fail "DeniaMD.zip" ke panel hosting.
+2. Ekstrak fail zip tersebut.
+3. Pastikan versi Node.js pelayan (Egg/Image) adalah Node.js 20 atau 22.
+4. Buka tab Console / Terminal pada panel, kemudian taip:
+      npm install --omit=dev
+5. Tekan butang START pada panel (atau jalankan: npm start).
+6. Imbas kod QR atau masukkan kod Pairing WhatsApp yang tertera di konsol.
+
+
+------------------------------------------------------
+B. CARA MENJALANKAN DI TERMUX (ANDROID)
+------------------------------------------------------
+1. Kemas kini pakej Termux dan pasang Node.js & FFmpeg:
+      pkg update -y
+      pkg install nodejs-lts ffmpeg -y
+
+2. Pindahkan atau ekstrak DeniaMD.zip:
+      unzip DeniaMD.zip -d DeniaMD
+      cd DeniaMD
+
+3. Pasang dependency bot:
+      npm install --omit=dev
+
+4. Hidupkan bot:
+      npm start
+
+5. Masukkan nombor telefon anda di terminal untuk menerima Pairing Code di WhatsApp.
+
+
+------------------------------------------------------
+PERINGATAN PENTING:
+------------------------------------------------------
+- Folder "packages/" mengandungi pakej Baileys tempatan (@sairidev/baileys-new). 
+  JANGAN PADAM folder tersebut supaya bot boleh dipasang tanpa masalah 404 npm.
+- Di dalam WhatsApp bot, anda boleh menaip perintah .carapakai pada bila-bila
+  masa untuk membaca panduan ini semula.
+======================================================
+

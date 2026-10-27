@@ -6,7 +6,6 @@
    "type": "module",
    "scripts": {
       "start": "node --max-old-space-size=256 --expose-gc index.js",
-      "start:agent": "node pc-agent/agent.js",
       "test:ai": "node tests/test_ai_intelligence.mjs",
       "test:imageedit": "node tests/test_imageedit.mjs",
       "test:broadcast": "node tests/test_broadcast_security.mjs"

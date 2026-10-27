@@ -58,8 +58,8 @@ global.temporaryFolder = 'temp'
 // Plugins folder name (optional)
 global.pluginsFolder = 'plugins'
 
-// Auth state folder name (optional) - menyokong pengasingan sesi setiap bot/nombor
-global.authFolder = process.env.AUTH_FOLDER || (global.botNumber ? `session/${global.botNumber}` : 'session')
+// Auth state folder name (optional)
+global.authFolder = 'session'
 
 // Store file name (optional)
 global.storeFilename = 'database/store.json'

@@ -1,9 +1,0 @@
-.vercel
-.env*
-!.env.example
-node_modules/
-.next/
-coverage/
-*.log
-security-*-results.json
-.backup-snapshot/

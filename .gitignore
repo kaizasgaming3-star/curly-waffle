@@ -6,3 +6,4 @@ backup/
 .env.*
 !.env.example
 *.log
+cloudflared/
