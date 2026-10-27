@@ -100,8 +100,7 @@ const Start = () => {
 
       cleanUp(instance)
 
-      if (code !== 0)
-         setTimeout(Start, 2000)
+      setTimeout(Start, 2000)
    })
 }
 

@@ -11,7 +11,7 @@ const getPingEmojis = (ms) => {
 }
 
 export default {
-   command: ['disk', 'ping', 'ram', 'run', 'server', 'statistic'],
+   command: ['disk', 'ping', 'ram', 'run', 'statistic'],
    category: 'other',
    async run (m, {
       sock,
@@ -35,8 +35,11 @@ export default {
                return (performance.now() - start).toFixed(2)
             })()
          ])
-         const print = frame('PING', [
-            '*RTT*: ' + rtt + ' ms',
+         const latencyVal = parseFloat(rtt)
+         const latencyVisual = latencyVal < 60 ? '🟢 Cemerlang' : latencyVal < 200 ? '🟡 Stabil' : '🔴 Perlahan'
+         const print = frame('STATUS & PING', [
+            '*Status*: 🟢 ONLINE (Operasional)',
+            '*RTT*: ' + rtt + ' ms (' + latencyVisual + ')',
             '*Presence*: ' + presence + ' ms'
          ], getPingEmojis(rtt))
          m.reply(print)
@@ -45,44 +48,6 @@ export default {
          m.reply('💾 *RAM Usage*: ' + formatSize(process.memoryUsage().rss) + ' / ' + formatSize(totalmem()))
       else if (command === 'run')
          m.reply('🕒 *Runtime*: ' + toTime(process.uptime() * SECOND))
-      else if (command === 'server') {
-         const cpu = cpus()
-         const totalMemory = totalmem()
-         const freeMemory = freemem()
-         const memoryUsage = process.memoryUsage()
-         const diskUsage = await getDiskStats()
-         const printServer = frame('SERVER', [
-            `*OS*: ${platform}`,
-            `*Arch*: ${arch}`,
-            `*Release*: ${release}`,
-            `*Uptime*: ${toTime(uptime * SECOND)}`
-         ], '🗄️')
-         const printSystem = frame('SYSTEM', [
-            `*CPU Model*: ${cpu[0]?.model || '-'}`,
-            `*CPU Speed*: ${cpu[0]?.speed || '-'}`,
-            `*CPU Count*: ${cpu.length || '-'}`,
-            `*RAM Used*: ${formatSize(totalMemory - freeMemory)} / ${formatSize(totalMemory)}`,
-            `*Disk Used*: ${formatSize(diskUsage.used)} / ${formatSize(diskUsage.total)}`
-         ], '💾')
-         const printProcess = frame('PROCESS', [
-            `*Node.js*: ${process.version}`,
-            `*V8*: ${process.versions.v8}`,
-            `*Heap Used*: ${formatSize(memoryUsage.heapUsed)} / ${formatSize(memoryUsage.heapTotal)}`,
-            `*RSS*: ${formatSize(memoryUsage.rss)}`,
-            `*External*: ${formatSize(memoryUsage.external)}`,
-            `*Runtime*: ${toTime(process.uptime() * SECOND)}`
-         ], '🔃')
-         m.reply(
-            printServer +
-            '\n\n' + printSystem +
-            '\n\n' + printProcess
-         , {
-            title: botName,
-            description: greeting(),
-            thumbnail: await fetchThumbnail(),
-            largeThumbnail: true
-         })
-      }
       else if (command === 'statistic') {
          const printStatistic = frame('STATISTIC', [
             `*Message Sent*: ${formatNumber(setting.messageEgress)}`,

@@ -1,10 +1,12 @@
 import { LRUCache } from 'lru-cache'
 import { cpus } from 'os'
+import { DEFAULT_CONNECTION_CONFIG, fetchLatestWaWebVersion } from '@sairidev/baileys-new'
 
 const CPU_COUNT = cpus().length
 
 // Owner name
 global.ownerName = 'Kaizas'
+global.ownerUsername = 'kaizas'
 
 // Owner phone number
 global.ownerNumber = '601118837488'
@@ -28,7 +30,7 @@ global.defaultLimit = 15
 global.stickerPackName = '📦 Denia Sticker'
 
 // Sticker pack publisher
-global.stickerPackPublisher = 'Sairi'
+global.stickerPackPublisher = 'kaizas'
 
 // ********** API KEYS ********** //
 
@@ -56,8 +58,8 @@ global.temporaryFolder = 'temp'
 // Plugins folder name (optional)
 global.pluginsFolder = 'plugins'
 
-// Auth state folder name (optional)
-global.authFolder = 'session'
+// Auth state folder name (optional) - menyokong pengasingan sesi setiap bot/nombor
+global.authFolder = process.env.AUTH_FOLDER || (global.botNumber ? `session/${global.botNumber}` : 'session')
 
 // Store file name (optional)
 global.storeFilename = 'database/store.json'
@@ -109,3 +111,13 @@ global.ExploreSession = new LRUCache({
    updateAgeOnHas: false,
    ttlAutopurge: true
 })
+
+// Auto-sync latest WhatsApp Web version non-blocking
+fetchLatestWaWebVersion()
+   .then(waWeb => {
+      if (waWeb?.version) {
+         DEFAULT_CONNECTION_CONFIG.version = waWeb.version
+      }
+   })
+   .catch(() => {})
+

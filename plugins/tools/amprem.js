@@ -33,10 +33,6 @@ export default {
       sock,
       args
    }) {
-      // 1. Private chat restriction (Group check)
-      if (m.isGroup) {
-         return m.reply('Fitur ini hanya boleh digunakan di private chat.')
-      }
 
       const subcmd = (args[0] || '').toLowerCase()
 

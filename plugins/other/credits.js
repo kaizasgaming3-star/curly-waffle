@@ -10,8 +10,6 @@
  * - This file may ONLY be used within the SairiDev project.
  */
 
-import { DONATE_URL } from '@sairidev/baileys-new'
-
 import { fetchThumbnail, frame, greeting } from '../../lib/Utilities.js'
 
 export default {
@@ -21,9 +19,6 @@ export default {
    async run(m) {
       const printCredits = frame('CREDITS', [
          'sairidev — Project Maintainer & Creator'
-      ])
-      const printInfoUrl = frame('INFO', [
-         DONATE_URL
       ])
       const printAPIs = frame('THIRD-PARTY SERVICES', [
          'rynn-k — Nekolabs API',
@@ -36,7 +31,6 @@ export default {
          'https://github.com/sairidev'
       ])
       m.reply(printCredits + '\n\n' +
-         printInfoUrl + '\n\n' +
          printAPIs + '\n\n' +
          printSourceCode, {
          title: botName,

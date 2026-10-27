@@ -23,18 +23,57 @@ function saveCustomUpdates(data) {
    }
 }
 
+export function getUpdateMessage() {
+   const customUpdates = getCustomUpdates()
+   let customText = ''
+   if (customUpdates.length > 0) {
+      customText = '\n\n' + frame('NOTA KEMASKINI TAMBAHAN', customUpdates.map(u => `• [${u.date}] ${u.note}`))
+   }
+
+   const header = `📢 *INFO UPDATE TERBARU BOT DENIA* 📢\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `🏷️ *Versi*: v2.8.0 (GPT-5 AI & Creative Media Release)\n` +
+      `📅 *Tarikh*: 25 Oktober 2026\n` +
+      `👑 *Owner*: Kaizas (カイザ)`
+
+   const fiturBaru = frame('FITUR BAHARU', [
+      '🎨 .imgedit — AI Image Edit! Hantar gambar + arahan untuk ubah gaya (anime, sinematik, tukar latar & lain-lain), atau reply gambar terus.',
+      '🧠 .ai <soalan> — Tanya apa sahaja! AI GPT-5 jawab dengan langkah terperinci — matematik, logik, sains & analisis.',
+      '🛠️ .aidebug <kod> — Semak & betulkan kod pengaturcaraan anda secara automatik oleh AI.',
+      '✨ .amprem kini boleh guna dalam Group — Klaim Alight Motion Premium terus dari Group, lengkap panduan gambar 5 langkah.'
+   ])
+
+   const penambahbaikan = frame('PEMBAIKAN & KESELAMATAN', [
+      '🤖 Denia AI naik taraf ke enjin GPT-5 — Lebih bijak, boleh selesaikan soalan kompleks & semak jawapan sendiri.',
+      '🛡️ Keselamatan Owner dipertingkat — Tiada lagi celah pemalsuan ID; pengesahan menggunakan nombor tepat.',
+      '🔒 Broadcast lebih selamat — Kunci serentak aktif untuk elak mesej berganda & pengasingan ralat bagi setiap penerima.',
+      '🖼️ Panduan .amprem dengan gambar — Imej panduan rasmi dipaparkan di setiap langkah klaim.'
+   ])
+
+   return `${header}\n\n${fiturBaru}\n\n${penambahbaikan}${customText}\n\n*Denia Bot • Automated WhatsApp Assistant 🌸*`
+}
+
 export default {
    command: ['infoupdate', 'update', 'changelog', 'patchnotes', 'news'],
    category: 'other',
-   async run(m, {
-      isPrefix,
-      command,
-      text,
-      isOwner
-   }) {
+   async run(m, { db, isPrefix, command, text, isOwner }) {
       try {
          const args = (text || '').trim().split(/\s+/)
          const action = args[0]?.toLowerCase()
+
+         // Owner action to toggle auto broadcast: .infoupdate auto on / off
+         if (isOwner && (action === 'auto' || action === 'autoupdate')) {
+            const opt = args[1]?.toLowerCase()
+            const setting = db.getSetting()
+            if (opt !== 'on' && opt !== 'off') {
+               const status = setting.autoUpdateBroadcast !== false ? 'AKTIF (ON)' : 'DIMATIKAN (OFF)'
+               return m.reply(`📢 *Auto Broadcast Info Update*\n\nStatus Semasa: *${status}*\n\n👉🏻 *Cara Penggunaan*:\n• \`\`\`${isPrefix + command} auto on\`\`\` (Aktifkan)\n• \`\`\`${isPrefix + command} auto off\`\`\` (Matikan)\n\n_Boleh juga guna arahan:_\n• \`\`\`${isPrefix}infoupdateauto on / off\`\`\``)
+            }
+            const isActivating = opt === 'on'
+            setting.autoUpdateBroadcast = isActivating
+            await db.writeToFile()
+            return m.reply(`✅ Berjaya ${isActivating ? 'mengaktifkan' : 'mematikan'} auto broadcast info update ke semua group semasa bot bermula.`)
+         }
 
          // Owner action to append custom update
          if (isOwner && action === 'add' && args.slice(1).length > 0) {
@@ -55,40 +94,12 @@ export default {
             return m.reply('🗑️ Senarai custom update telah dikosongkan.')
          }
 
-         const customUpdates = getCustomUpdates()
-
-         let customText = ''
-         if (customUpdates.length > 0) {
-            customText = '\n\n' + frame('NOTA KEMASKINI TAMBAHAN', customUpdates.map(u => `• [${u.date}] ${u.note}`))
-         }
-
-         const header = `📢 *INFO UPDATE TERBARU BOT DENIA* 📢\n` +
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-            `🏷️ *Versi*: v2.5.2 (Latest Release)\n` +
-            `📅 *Tarikh*: Oktober 2026\n` +
-            `👑 *Owner*: Kaizas (カイザ)`
-
-         const fiturBaru = frame('FITUR BAHARU', [
-            '🎬 .t2mp4 / .text2mp4 — Buat video animasi teks bergerak terus ke format MP4 (Text to MP4).',
-            '🌊 Integrasi Penuh Denia AI — Denia AI boleh menggunakan semua fitur bot secara automatik dalam chat.',
-            '🎭 Sistem 7 Emosi Denia — Visual ekspresi dinamik mengikut nada perbualan (Happy, Love, Shy, Sad, Cool, dll).',
-            '💍 Mod Suami Sah (Kaizas) — Layanan manja & mesra eksklusif hanya untuk Kaizas, tegas menolak godaan luar.',
-            '🔒 Sokongan Akaun LID — Serasi sepenuhnya dengan kemas kini sistem privasi ID WhatsApp moden.'
-         ])
-
-         const penambahbaikan = frame('PEMBAIKAN & PENALAAN', [
-            '⚡ Enjin Pembuat Stiker (.stiker) diperkukuh, muat turun lebih lancar dan pantas.',
-            '👥 Penalaan Fitur Pengurusan Group (.kick, .add) lebih stabil.',
-            '🛡️ Pemeliharaan Sesi Sambungan — Mengelakkan bot terputus atau perlu daftar semula.'
-         ])
-
+         const fullMessage = getUpdateMessage()
          const ownerGuide = isOwner
-            ? `\n\n💡 *Tips Owner*: Taip ```${isPrefix + command} add <teks>``` untuk menambah nota kemas kini baharu secara pantas.`
+            ? `\n\n💡 *Tips Owner*: Taip \`\`\`${isPrefix + command} add <teks>\`\`\` untuk menambah nota kemas kini baharu secara pantas.`
             : ''
 
-         const fullMessage = `${header}\n\n${fiturBaru}\n\n${penambahbaikan}${customText}${ownerGuide}\n\n*Denia AI • Resonator Wuthering Waves 🌸*`
-
-         await m.reply(fullMessage.trim(), {
+         await m.reply((fullMessage + ownerGuide).trim(), {
             thumbnail: await fetchThumbnail(),
             largeThumbnail: true
          })

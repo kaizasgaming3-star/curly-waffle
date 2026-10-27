@@ -1,7 +1,7 @@
 import { nekolabs } from '../../lib/Request.js'
 
 export default {
-   command: 'pin',
+   command: ['pindl', 'pindownload', 'dlpin'],
    category: 'download',
    async run(m, {
       sock,

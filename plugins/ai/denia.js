@@ -11,6 +11,7 @@ import { tikwm } from '../../lib/Scraper.js'
 import { optimizeVideoForWhatsApp, ensureTikTokUrl } from '../../lib/Components/TikTokOptimizer.js'
 import { CommandIndex } from '../../lib/Watcher.js'
 import { isMimeImage, isMimeVideo, isMimeAudio } from '../../lib/Utilities.js'
+import AIAdapter, { queryAI, queryAnalytical, debugCode } from '../../lib/Components/AIAdapter.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -195,70 +196,9 @@ function pickEmotion(userText = '', botAnswer = '', isKaizas = false) {
    return isKaizas ? 'love' : 'happy'
 }
 
-// ─── 4. 5 Endpoint Prexzy APIs (Fallback Terbukti Aktif) ──────────────────────
-async function fetchWithTimeout(url, timeoutMs = 15000) {
-   const res = await fetch(url, {
-      signal: AbortSignal.timeout(timeoutMs),
-      headers: {
-         'Accept': 'application/json',
-         'User-Agent': 'Mozilla/5.0 (compatible; DeniaBot/1.0)'
-      }
-   })
-   if (!res.ok) throw new Error(`HTTP ${res.status}`)
-   return await res.json()
-}
-
-const APIS = [
-   {
-      name: 'Prexzy-Gemini',
-      call: async (q) => {
-         const data = await fetchWithTimeout(`https://prexzyapis.com/ai/gemini?prompt=${encodeURIComponent(q)}`)
-         return data?.response || data?.result || data?.answer || null
-      }
-   },
-   {
-      name: 'Prexzy-CH',
-      call: async (q) => {
-         const data = await fetchWithTimeout(`https://prexzyapis.com/ai/ch?q=${encodeURIComponent(q)}`)
-         return data?.response || data?.result || data?.answer || null
-      }
-   },
-   {
-      name: 'Prexzy-Qwen',
-      call: async (q) => {
-         const data = await fetchWithTimeout(`https://prexzyapis.com/ai/qwen?prompt=${encodeURIComponent(q)}`)
-         return data?.response || data?.result || data?.answer || null
-      }
-   },
-   {
-      name: 'Prexzy-AskGPT5',
-      call: async (q) => {
-         const data = await fetchWithTimeout(`https://prexzyapis.com/ai/askgpt5?prompt=${encodeURIComponent(q)}`)
-         return data?.response || data?.result || data?.answer || null
-      }
-   },
-   {
-      name: 'Prexzy-Olabiba',
-      call: async (q) => {
-         const data = await fetchWithTimeout(`https://prexzyapis.com/ai/olabiba?prompt=${encodeURIComponent(q)}`)
-         return data?.response || data?.result || data?.answer || null
-      }
-   }
-]
-
-async function requestDeniaAI(prompt) {
-   let lastErr = null
-   for (const api of APIS) {
-      try {
-         const res = await api.call(prompt)
-         if (res && typeof res === 'string' && res.trim().length > 0) {
-            return res.trim()
-         }
-      } catch (err) {
-         lastErr = err
-      }
-   }
-   throw new Error(lastErr?.message || 'Semua AI endpoint gagal merespon')
+// ─── 4. Enjin Denia AI (GPT-5 & Fallback Terbukti Aktif via AIAdapter) ───────
+async function requestDeniaAI(prompt, options = {}) {
+   return await AIAdapter.queryAI(prompt, options)
 }
 
 // ─── 5. Pembangun Prompt Watak Denia (SANGAT KETAT: Kaizas vs Pengguna Lain) ───
@@ -288,7 +228,13 @@ Contoh:
 - Minta lagu: [CMD: play dj remix]
 - Minta stiker: [CMD: sticker]
 - Minta brat: [CMD: brat Teks Di Sini]
-- Minta ping/menu/tagall: [CMD: ping] / [CMD: menu] / [CMD: tagall]`
+- Minta ping/menu/tagall: [CMD: ping] / [CMD: menu] / [CMD: tagall]
+
+KEPINTARAN & PENAAKULAN PINTAR (GPT-5 ENHANCED):
+- Jika Kaizas bertanya soalan ILMU, MATEMATIK, LOGIK, SAINS, KOD, atau ANALISIS TEKNIKAL:
+  1. Tunjukkan kebijaksanaan Denia! Terangkan langkah demi langkah atau jalan kira yang tepat dan jelas.
+  2. Bezakan fakta sahih daripada andaian, dan akui dengan jujur jika maklumat tidak lengkap.
+  3. Selitkan nada mesra/manja di awal/akhir jawapan.`
       : `Kamu adalah Denia, Resonator dari dunia Wuthering Waves (Solaris-3).
 PERATURAN PENTING & KETAT:
 PENGGUNA INI BUKAN KAIZAS! MEREKA ADALAH PENGGUNA BIASA.
@@ -307,7 +253,13 @@ PERATURAN PENTING GAYA JAWAPAN (SANGAT KETAT):
 
 KUASA FITUR BOT:
 Denia boleh membantu menjalankan fungsi bot jika diminta (contoh: cari gambar, pasang lagu, buat stiker, brat, video teks animasi [text2mp4 <teks>], info update [infoupdate], menu, ping, dll.):
-Balas ringkas dan sertakan di hujung jawapan: [CMD: nama_command argumen]`
+Balas ringkas dan sertakan di hujung jawapan: [CMD: nama_command argumen]
+
+KEPINTARAN & PENAAKULAN PINTAR (GPT-5 ENHANCED):
+- Jika pengguna bertanya soalan MATEMATIK, LOGIK, SAINS, PENGATURCARAAN KOD, atau ANALISIS:
+  1. Berikan penerangan berstruktur, lengkap, dan tunjukkan langkah demi langkah.
+  2. Bezakan fakta daripada andaian atau jangkaan.
+  3. Untuk pengaturcaraan, kendalikan kes tepi (edge cases) dengan teliti.`
 
    let contextStr = ''
    if (historyList && historyList.length > 0) {
@@ -883,18 +835,49 @@ async function handleAutoReply(m, sock, rawText, extraContext = {}) {
 
 // ─── 8. Export Utama Sesuai Watcher.js ─────────────────────────────────────────
 export default {
-   command: ['denia', 'aidenia', 'deniaai'],
+   command: ['denia', 'aidenia', 'deniaai', 'ai', 'aidebug', 'ai-debug'],
    category: 'ai',
 
    async run(m, {
       sock,
       args,
-      text
+      text,
+      command
    }) {
       const key = getSessionKey(m)
       const isKaizasUser = checkIsKaizas(m)
       const subcmd = (args?.[0] || '').toLowerCase()
       const db = readDeniaDB()
+
+      // ─── 0. Arahan Terus: .ai <soalan> ──────────────────────────────────────
+      if (command === 'ai') {
+         const q = text ? text.trim() : args.join(' ').trim()
+         if (!q) {
+            return m.reply('Sila sertakan soalan atau masalah anda.\n\nContoh:\n`.ai Berapakah harga pen jika sebatang pen dan buku berharga RM11 dan buku RM10 lebih mahal?`')
+         }
+         await m.react('🧠')
+         try {
+            const answer = await queryAnalytical(q)
+            return m.reply(`🧠───「 *DENIA AI • GPT-5* 」───🧠\n\n${answer}`)
+         } catch (e) {
+            return m.reply(`❌ Maaf, ralat semasa memproses soalan: ${e.message}`)
+         }
+      }
+
+      // ─── 0. Arahan Terus: .aidebug / .ai-debug <kod> ─────────────────────────
+      if (command === 'aidebug' || command === 'ai-debug') {
+         const code = text ? text.trim() : args.join(' ').trim()
+         if (!code) {
+            return m.reply('Sila sertakan kod atau masalah yang ingin diperiksa.\n\nContoh:\n`.aidebug function findSecond(arr) { ... }`')
+         }
+         await m.react('🔍')
+         try {
+            const answer = await debugCode(code)
+            return m.reply(`🛠️───「 *DENIA CODE DEBUGGER* 」───🛠️\n\n${answer}`)
+         } catch (e) {
+            return m.reply(`❌ Maaf, ralat semasa menganalisis kod: ${e.message}`)
+         }
+      }
 
       // ─── A. .denia on ───────────────────────────────────────────────────────
       if (subcmd === 'on' || subcmd === 'aktif' || subcmd === 'enable') {

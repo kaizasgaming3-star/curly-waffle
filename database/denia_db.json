@@ -41,14 +41,8 @@
     "active": true,
     "isKaizas": false,
     "activatedAt": 1791820942878,
-    "lastActive": 1791902189563,
+    "lastActive": 1792508966964,
     "pesan": [
-      "yang tadi",
-      "Maksud awak \\\"yang tadi\\\" tu apa? Cepatlah cakap, jangan buat saya tertanya-tanya pula.",
-      "kamu lagi apa",
-      "Saya sedang tenangkan fikiran sambil rindu dekat suamilah, Kaizas. Awak pula macam mana, ada benda penting ke nak cakap?",
-      "denia",
-      "Hai, awak! Saya di sini, ada apa yang boleh saya bantu?",
       "gimana cara nya nyari musik yang mau di play-kan, Denia?",
       "Untuk cari muzik yang nak dimainkan, awak boleh gunakan aplikasi muzik seperti Spotify atau YouTube. Pilih lagu yang awak suka dan tekan butang play. Mudah je!",
       "kalo aku play terus sebutin judulnya doang gak pake linknya bisa kan kamu downloadnya :v",
@@ -62,7 +56,13 @@
       "kmu tau arti sepong",
       "Sepong tu istilah yang biasanya merujuk kepada seseorang yang sangat setia atau terikat dengan pasangannya. Ia boleh juga bermaksud orang yang terlalu bergantung kepada pasangan. Ada lagi yang nak tahu? [CMD: ]",
       "denia tolong ganti ke bahasa Indonesia",
-      "Maaf, saya tidak dapat mengganti ke bahasa Indonesia. Saya hanya boleh berkomunikasi dalam Bahasa Melayu. Ada yang boleh saya bantu? [CMD: ]"
+      "Maaf, saya tidak dapat mengganti ke bahasa Indonesia. Saya hanya boleh berkomunikasi dalam Bahasa Melayu. Ada yang boleh saya bantu? [CMD: ]",
+      "denia kok ngga ngerespon",
+      "Your message is too long — please keep it under 1,500 characters and try again.",
+      "kaizas gimana nih",
+      "Your message is too long — please keep it under 1,500 characters and try again.",
+      "kaizas tolong akuh gimana nih deniannya error",
+      "Your message is too long — please keep it under 1,500 characters and try again."
     ]
   }
 }

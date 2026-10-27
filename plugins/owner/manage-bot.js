@@ -44,7 +44,8 @@ const SETTING_MAPS = {
    rejectcall: 'rejectCall',
    securelabel: 'secureLabel',
    slowmode: 'slowMode',
-   typingpresence: 'typingPresence'
+   typingpresence: 'typingPresence',
+   infoupdateauto: 'autoUpdateBroadcast'
 }
 
 const PRETTY_SETTING_MAPS = {
@@ -61,7 +62,8 @@ const PRETTY_SETTING_MAPS = {
    rejectcall: 'Reject Call',
    securelabel: 'Secure Label',
    slowmode: 'Slow Mode',
-   typingpresence: 'Typing Presence'
+   typingpresence: 'Typing Presence',
+   infoupdateauto: 'Auto Broadcast Info Update'
 }
 
 const ExcludeForWrap = new Set(['.git', '.github', '.gitignore', 'node_modules', 'package-lock.json', 'session', 'yarn.lock', 'web panel', databaseFilename, storeFilename, temporaryFolder])
@@ -139,8 +141,8 @@ const addStream = async (zip, fullPath, relPath, outputStream) => {
    deflate.push(new Uint8Array(0), true)
 }
 
-const wrapScript = () => {
-   const filePath = join(temporaryFolder, `Denia-${createFileName()}.zip`)
+const wrapScript = (customName = 'DeniaMD.zip') => {
+   const filePath = join(temporaryFolder, customName)
    const output = createWriteStream(filePath)
 
    return new Promise((resolve, reject) => {
@@ -190,7 +192,7 @@ const atomicWrite = (db, store) =>
    ])
 
 export default {
-   command: ['afknotifier', 'autodownload', 'backup', 'backupsc', 'chatbot', 'commandsuggestion', 'disable', 'enable', 'gconly', 'menumusic', 'noprefix', 'notifier', 'public', 'reactstatus', 'readmessage', 'rejectcall', 'resetlimit', 'restart', 'restore', 'securelabel', 'setbroadcastcd', 'setinstruction', 'setmenu', 'setmenumusic', 'setmenumessage', 'setmodel', 'setname', 'setbio', 'setpp', 'setcover', 'setchid', 'setreply', 'slowmode', 'self', 'typingpresence', 'updatesc', '+prefix', '-prefix'],
+   command: ['afknotifier', 'autodownload', 'backup', 'backupsc', 'chatbot', 'commandsuggestion', 'disable', 'enable', 'gconly', 'infoupdateauto', 'menumusic', 'noprefix', 'notifier', 'public', 'reactstatus', 'readmessage', 'rejectcall', 'resetlimit', 'restart', 'restore', 'securelabel', 'setbroadcastcd', 'setinstruction', 'setmenu', 'setmenumusic', 'setmenumessage', 'setmodel', 'setname', 'setbio', 'setpp', 'setcover', 'setchid', 'setreply', 'slowmode', 'self', 'typingpresence', 'updatesc', '+prefix', '-prefix'],
    category: 'owner',
    async run (m, {
       sock,
@@ -207,6 +209,7 @@ export default {
          command === 'autodownload' ||
          command === 'chatbot' ||
          command === 'commandsuggestion' ||
+         command === 'infoupdateauto' ||
          command === 'menumusic' ||
          command === 'gconly' ||
          command === 'noprefix' ||
@@ -255,11 +258,24 @@ export default {
       else if (command === 'backupsc') {
          m.react('🕒')
          try {
-            const filePath = await wrapScript()
-            await sock.sendMedia(m.chat, filePath, '✅ Backup completed.', m, {
+            const filePath = await wrapScript('DeniaMD.zip')
+            const caption = `✅ *Backup Berjaya Disimpan!*
+
+📦 *Nama Fail:* \`DeniaMD.zip\`
+
+📌 *Langkah Pasang Semula (Hosting / Termux):*
+1. Ekstrak fail \`DeniaMD.zip\`
+2. Buka terminal & jalankan:
+   \`npm install --omit=dev\`
+3. Hidupkan bot:
+   \`npm start\`
+
+💡 Taip *.carapakai* untuk panduan penuh.`
+            await sock.sendMedia(m.chat, filePath, caption, m, {
                document: true,
-               fileName: basename(filePath)
+               fileName: 'DeniaMD.zip'
             })
+            await unlink(filePath).catch(() => {})
          } catch (err) {
             console.error('[BACKUP] Error:', err)
             m.reply(`❌ Gagal membuat backup script: ${err?.message || 'Ralat sistem'}`)
