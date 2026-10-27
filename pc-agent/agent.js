@@ -17,11 +17,13 @@ import fs from "fs";
 import { makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore, Browsers, fetchLatestWaWebVersion } from "@sairidev/baileys-new";
 import pino from "pino";
 
-const PORT = parseInt(process.env.AGENT_PORT || "4000", 10);
+const PORT = parseInt(process.env.PORT || process.env.AGENT_PORT || "4000", 10);
 const HOST = process.env.AGENT_HOST || "0.0.0.0";
 const SECRET_TOKEN = process.env.AGENT_SECRET_TOKEN || "denia_token_rahsia_pc_kaizas_999";
 
-const BOT_ROOT = path.resolve(process.cwd(), "..");
+const BOT_ROOT = fs.existsSync(path.join(process.cwd(), "index.js"))
+  ? process.cwd()
+  : path.resolve(process.cwd(), "..");
 const DB_FILE = path.join(BOT_ROOT, "database", "database.json");
 const SESSION_DIR = path.join(BOT_ROOT, "session");
 

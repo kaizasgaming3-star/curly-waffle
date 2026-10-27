@@ -5,7 +5,11 @@
    "main": "index.js",
    "type": "module",
    "scripts": {
-      "start": "node --max-old-space-size=256 --expose-gc index.js"
+      "start": "node --max-old-space-size=256 --expose-gc index.js",
+      "start:agent": "node pc-agent/agent.js",
+      "test:ai": "node tests/test_ai_intelligence.mjs",
+      "test:imageedit": "node tests/test_imageedit.mjs",
+      "test:broadcast": "node tests/test_broadcast_security.mjs"
    },
    "keywords": [
       "automation",
@@ -17,11 +21,11 @@
       "whatsapp",
       "whatsapp-bot"
    ],
-   "author": "Sairi",
+   "author": "kaizas",
    "license": "MIT",
    "dependencies": {
       "@napi-rs/image": "^1.12.0",
-      "@sairidev/baileys-new": "latest",
+      "@sairidev/baileys-new": "file:./packages/sairidev-baileys-new-0.3.21.tgz",
       "cheerio": "^1.0.0",
       "file-type": "21.3.4",
       "qrcode": "~1.5.4",
